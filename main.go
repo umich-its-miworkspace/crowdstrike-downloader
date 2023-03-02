@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -13,9 +14,19 @@ import (
 )
 
 func main() {
+	clientId := flag.String("client-id", os.Getenv("FALCON_CLIENT_ID"), "Client ID for accessing CrowdStrike Falcon Platform (default taken from FALCON_CLIENT_ID env)")
+	clientSecret := flag.String("client-secret", os.Getenv("FALCON_CLIENT_SECRET"), "Client Secret for accessing CrowdStrike Falcon Platform (default taken from FALCON_CLIENT_SECRET)")
+	flag.Parse()
+
+	if *clientId == "" || *clientSecret == "" {
+		log.Println("need --client-id and --client-secret, or ")
+		log.Println("  set environment variables FALCON_CLIENT_ID and FALCON_CLIENT_SECRET")
+		os.Exit(1)
+	}
+
 	client, err := falcon.NewClient(&falcon.ApiConfig{
-		ClientId:     "",
-		ClientSecret: "",
+		ClientId:     *clientId,
+		ClientSecret: *clientSecret,
 		Debug:        false,
 		Context:      context.Background(),
 	})
